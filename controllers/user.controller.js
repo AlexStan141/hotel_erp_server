@@ -11,7 +11,7 @@ const register = async (req, res) => {
         return res.json({
             status: "error",
             code: 409,
-            message: "Email deja înregistrat" 
+            message: "Email already registered" 
         });
     } 
 
@@ -22,7 +22,7 @@ const register = async (req, res) => {
     res.json({ 
         status: "success",
         code: 200,
-        message: "Utilizator creat cu succes!"
+        message: "User created successfully!"
     });
 
   } catch (error) {
@@ -34,6 +34,45 @@ const register = async (req, res) => {
   }
 };
 
+
+const login = async (req, res) => {
+  try {
+    const {email, password} = req.body;
+
+    const user = await User.findOne({email});
+    if(!user || !user.validPassword(password)){
+      return res.json({
+        status: "error",
+        code: 401,
+        message: "Unauthorized"
+      })
+    }
+
+    const payload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role
+    }
+
+    const token = jwt.sign(payload, process.env.secret, {expiresIn: '1h'});
+    return res.json({
+      status: "success",
+      code: 200,
+      data: token
+    })
+
+  } catch(error) {
+    res.json({ 
+        status: "error",
+        code: 500,
+        message: error.message
+    });
+  }
+}
+
+
 module.exports = {
-  register
+  register,
+  login
 }

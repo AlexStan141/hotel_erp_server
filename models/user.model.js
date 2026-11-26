@@ -21,16 +21,11 @@ const UserSchema = new mongoose.Schema({
 })
 
 UserSchema.methods.setPassword = function(password) {
-  var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-  if(password && re.test(password)){
-    this.password = bCrypt.hashSync(password, bCrypt.genSaltSync(6));
-  } else {
-    throw new Error("Password must have uppercase letters, lowercase letters, numbers and symbols")
-  }
+  this.password = bCrypt.hashSync(password, bCrypt.genSaltSync(6));
 };
 
 UserSchema.methods.validPassword = function(password) {
   return bCrypt.compareSync(password, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
